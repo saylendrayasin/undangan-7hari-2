@@ -8,7 +8,14 @@
 
   var EVENT_ISO = '2026-08-29T19:30:00+08:00'; // 19.30 WITA
   var EVENT_AT = new Date(EVENT_ISO);
+  var EVENT_HOURS = 2;
+  var EVENT_END = new Date(EVENT_AT.getTime() + EVENT_HOURS * 3600 * 1000);
   var LOCAL_KEY = 'undangan-takziah-7-doa';
+
+  var EVENT_TITLE = 'Takziah Hari Ke-7 Ibu Nurhaeda Yasin, SE';
+  var EVENT_PLACE = 'Rumah Duka, Dusun 1 Desa Molibagu, Bolaang Uki';
+  var EVENT_NOTE = 'Takziah dan doa bersama. Penceramah: Al Habib Umar Bin Toha Alhabsiy';
+  var MAPS_URL = 'https://maps.app.goo.gl/VYpwPbzHdaEHzKU2A';
 
   var $ = function (id) { return document.getElementById(id); };
 
@@ -16,6 +23,7 @@
 
   var COUNTDOWN_UNITS = ['Hari', 'Jam', 'Menit', 'Detik'];
   var countdownValues = [];
+  var countdownTimer = null;
 
   function buildCountdown() {
     var host = $('countdown');
@@ -36,7 +44,8 @@
   }
 
   function tickCountdown() {
-    var left = Math.max(0, EVENT_AT.getTime() - Date.now());
+    var now = Date.now();
+    var left = Math.max(0, EVENT_AT.getTime() - now);
     var s = Math.floor(left / 1000);
     var parts = [
       Math.floor(s / 86400),
@@ -48,29 +57,77 @@
       var text = String(n).padStart(2, '0');
       if (countdownValues[i].textContent !== text) countdownValues[i].textContent = text;
     });
+
+    // Setelah waktunya tiba, deretan angka nol tidak lagi berarti apa-apa —
+    // ganti dengan keterangan yang sesuai keadaan.
+    if (left > 0) return;
+    var host = document.getElementById('countdown');
+    var label = now < EVENT_END.getTime()
+      ? 'Acara sedang berlangsung'
+      : 'Acara telah selesai. Terima kasih atas doa dan kehadirannya.';
+    if (host.getAttribute('data-state') === label) return;
+    host.setAttribute('data-state', label);
+    host.classList.add('countdown__done');
+    host.textContent = label;
+    clearInterval(countdownTimer);
   }
 
   /* ---------------- Calendar file ---------------- */
 
-  function buildIcs() {
-    var stamp = function (d) { return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'; };
-    var end = new Date(EVENT_AT.getTime() + 2 * 3600 * 1000);
+  // Waktu UTC dengan format yang dipakai iCalendar dan Google Calendar.
+  function stampUtc(d) {
+    return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  }
+
+  function buildCalendar() {
+    // Google Calendar: paling andal di HP, karena terbuka langsung di aplikasi
+    // atau browser tanpa perlu mengunduh berkas.
+    var gcal = 'https://calendar.google.com/calendar/render' +
+      '?action=TEMPLATE' +
+      '&text=' + encodeURIComponent(EVENT_TITLE) +
+      '&dates=' + stampUtc(EVENT_AT) + '/' + stampUtc(EVENT_END) +
+      '&details=' + encodeURIComponent(EVENT_NOTE + '\n\nLokasi: ' + MAPS_URL) +
+      '&location=' + encodeURIComponent(EVENT_PLACE) +
+      '&ctz=Asia/Makassar';
+    $('gcal').href = gcal;
+
+    // Berkas .ics untuk iPhone, Outlook, dan aplikasi kalender lain.
+    // Baris DESCRIPTION harus di-escape sesuai aturan iCalendar.
+    var esc = function (text) {
+      return String(text).replace(/\\/g, '\\\\').replace(/;/g, '\\;')
+        .replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    };
     var lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//Undangan Takziah//ID',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
       'BEGIN:VEVENT',
-      'UID:takziah-7-nurhaeda-yasin',
-      'DTSTAMP:' + stamp(new Date()),
-      'DTSTART:' + stamp(EVENT_AT),
-      'DTEND:' + stamp(end),
-      'SUMMARY:Takziah Hari Ke-7 Ibu Nurhaeda Yasin, SE',
-      'LOCATION:Rumah Duka, Dusun 1 Desa Molibagu',
-      'DESCRIPTION:Takziah dan doa bersama. Penceramah: Al Habib Umar Bin Toha Alhabsiy',
+      'UID:takziah-7-nurhaeda-yasin@undangan',
+      'DTSTAMP:' + stampUtc(new Date()),
+      'DTSTART:' + stampUtc(EVENT_AT),
+      'DTEND:' + stampUtc(EVENT_END),
+      'SUMMARY:' + esc(EVENT_TITLE),
+      'LOCATION:' + esc(EVENT_PLACE),
+      'DESCRIPTION:' + esc(EVENT_NOTE + '\nLokasi: ' + MAPS_URL),
+      'BEGIN:VALARM',
+      'TRIGGER:-PT2H',
+      'ACTION:DISPLAY',
+      'DESCRIPTION:' + esc(EVENT_TITLE),
+      'END:VALARM',
       'END:VEVENT',
       'END:VCALENDAR'
     ].join('\r\n');
-    $('ics').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(lines);
+
+    // Blob lebih dapat diandalkan daripada data: URI pada Safari dan
+    // browser di dalam aplikasi seperti WhatsApp.
+    var link = $('ics');
+    if (typeof Blob !== 'undefined' && window.URL && window.URL.createObjectURL) {
+      link.href = URL.createObjectURL(new Blob([lines], { type: 'text/calendar;charset=utf-8' }));
+    } else {
+      link.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(lines);
+    }
   }
 
   /* ---------------- Share ---------------- */
@@ -303,8 +360,8 @@
 
   buildCountdown();
   tickCountdown();
-  setInterval(tickCountdown, 1000);
-  buildIcs();
+  countdownTimer = setInterval(tickCountdown, 1000);
+  buildCalendar();
   setupShare();
 
   $('doa-form').addEventListener('submit', submitEntry);

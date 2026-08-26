@@ -6,10 +6,23 @@
 <title>Undangan Takziah Hari Ke-7 &middot; Ibu Nurhaeda Yasin, SE</title>
 <meta name="description" content="Undangan takziah hari ke-7 wafatnya Almarhumah Ibu Nurhaeda Yasin, SE. Sabtu, 29 Agustus 2026, 19.30 WITA, Rumah Duka, Dusun 1 Desa Molibagu." />
 <meta name="theme-color" content="#fffdf8" />
+<!-- ============================================================
+     Preview saat tautan dibagikan di WhatsApp / Facebook.
+     Robot WhatsApp TIDAK menjalankan JavaScript dan butuh alamat
+     LENGKAP, jadi domain di bawah harus ditulis apa adanya.
+     Kalau domain undangan berbeda, ganti ketiga baris berikut.
+     ============================================================ -->
 <meta property="og:type" content="website" />
+<meta property="og:site_name" content="Undangan Takziah" />
+<meta property="og:locale" content="id_ID" />
 <meta property="og:title" content="Undangan Takziah Hari Ke-7 &middot; Ibu Nurhaeda Yasin, SE" />
 <meta property="og:description" content="Sabtu, 29 Agustus 2026 &middot; 19.30 WITA &middot; Rumah Duka, Dusun 1 Desa Molibagu." />
-<meta property="og:image" content="foto-almarhumah.jpg" />
+<meta property="og:url" content="https://undangan-7hari-2.vercel.app/" />
+<meta property="og:image" content="https://undangan-7hari-2.vercel.app/foto-almarhumah.jpg" />
+<meta property="og:image:width" content="854" />
+<meta property="og:image:height" content="1280" />
+<meta property="og:image:alt" content="Almarhumah Ibu Nurhaeda Yasin, SE" />
+<meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fffdf8'/%3E%3Cpath d='M16 6l2.6 7.4L26 16l-7.4 2.6L16 26l-2.6-7.4L6 16l7.4-2.6z' fill='%23c9a24c'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -140,12 +153,19 @@
   .btn--solid { border: 1px solid var(--gold); background: var(--gold); color: var(--bg); }
   .btn--solid:hover { background: #b4893c; border-color: #b4893c; }
   .btn[disabled] { opacity: .55; cursor: progress; }
+  .btn--small { padding: 0 18px; font-size: 9.5px; letter-spacing: .16em; }
 
   .countdown { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: clamp(20px, 3vw, 30px); background: var(--bg-alt); padding: clamp(26px, 4vw, 40px) clamp(18px, 3vw, 32px); text-align: center; }
   .countdown__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(6px, 1vw, 12px); }
   .unit { border: 1px solid #ece0c6; border-radius: 14px; background: var(--bg); padding: clamp(12px, 2vw, 18px) 4px; }
   .unit__value { font-family: var(--serif); font-size: clamp(24px, 3.4vw, 38px); line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
   .unit__label { margin-top: 8px; font-size: clamp(8.5px, .9vw, 10px); letter-spacing: .16em; text-transform: uppercase; color: var(--gold-deep); }
+  .countdown__done {
+    display: block; border: 1px solid #ece0c6; border-radius: 14px; background: var(--bg);
+    padding: clamp(18px, 3vw, 26px) clamp(14px, 2vw, 20px);
+    font-family: var(--serif); font-size: clamp(18px, 2.2vw, 24px); line-height: 1.4;
+    color: var(--ink); text-wrap: pretty;
+  }
   .countdown__note { margin: 0; font-family: var(--serif); font-style: italic; font-size: clamp(15px, 1.6vw, 19px); line-height: 1.8; color: #7a746a; text-wrap: pretty; }
 
   /* ---------- Ucapan & Doa ---------- */
@@ -269,8 +289,9 @@
           <div><div class="detail__value">Al Habib Umar Bin Toha Alhabsiy</div></div>
         </div>
         <div class="actions acara__actions">
-          <a class="btn btn--gold" href="https://www.google.com/maps/search/?api=1&amp;query=Desa+Molibagu+Bolaang+Uki" target="_blank" rel="noopener">Lihat Lokasi</a>
-          <a class="btn btn--ghost" id="ics" download="takziah-7-hari.ics" href="#">Simpan ke Kalender</a>
+          <a class="btn btn--gold" href="https://maps.app.goo.gl/VYpwPbzHdaEHzKU2A" target="_blank" rel="noopener">Lihat Lokasi</a>
+          <a class="btn btn--gold" id="gcal" href="#" target="_blank" rel="noopener">Google Kalender</a>
+          <a class="btn btn--ghost btn--small" id="ics" download="takziah-7-hari.ics" href="#">Unduh .ics</a>
         </div>
       </div>
       <div class="card countdown">

@@ -12,7 +12,9 @@ public/app.js                countdown, tombol kalender, share, form doa
 public/admin.html            halaman admin untuk menghapus doa
 public/foto-almarhumah.jpg   foto yang tampil di undangan
 api/doa.js                   API buku tamu (Vercel Serverless Function)
+dev-server.js                server lokal untuk mencoba di komputer sendiri
 vercel.json                  header cache
+.env.example                 contoh environment variable
 assets-src/                  file sumber, tidak ikut ter-deploy
 ```
 
@@ -104,7 +106,8 @@ tampil untuk semua tamu undangan"*.
 
 ## Halaman admin
 
-Alamatnya: `https://NAMA-PROJECT.vercel.app/admin.html`
+Alamatnya: `https://NAMA-PROJECT.vercel.app/admin`
+(`/admin.html` juga tetap bisa — otomatis diarahkan ke sana)
 
 Untuk mengaktifkannya, tambahkan Environment Variable `ADMIN_TOKEN` di Vercel
 (isi token acak yang panjang), lalu **redeploy**. Buka halaman admin, masukkan
@@ -134,8 +137,18 @@ mode admin aktif. Yang ditampilkan hanya nama variabel dan status `true`/`false`
 — **nilai token tidak pernah ditampilkan**.
 
 ```json
-{ "storage": "redis", "redisReachable": true, "adminEnabled": true, ... }
+{
+  "storage": "redis",
+  "redisReachable": true,
+  "adminEnabled": true,
+  "nodeVersion": "v22.x",
+  "fetchAvailable": true
+}
 ```
+
+Kalau `fetchAvailable` bernilai `false`, versi Node di Vercel terlalu lama.
+Naikkan lewat **Settings → General → Node.js Version** (pilih 20 atau 22),
+lalu redeploy.
 
 ## Perlindungan spam
 
@@ -147,22 +160,57 @@ Sudah termasuk di `api/doa.js`:
 - daftar disimpan maksimal 500 doa terakhir
 - percobaan token admin dibatasi 10 kali per IP tiap 15 menit
 
+## Sebelum deploy: satu hal yang perlu dicek
+
+Preview WhatsApp memakai alamat lengkap yang ditulis di `public/index.html`:
+
+```html
+<meta property="og:url"   content="https://undangan-7hari-2.vercel.app/" />
+<meta property="og:image" content="https://undangan-7hari-2.vercel.app/foto-almarhumah.jpg" />
+```
+
+Nilai itu ditulis sesuai nama repo, yang biasanya sama dengan domain bawaan
+Vercel. **Kalau domain undangan ternyata berbeda, ganti kedua baris tersebut**
+lalu deploy ulang — kalau tidak, foto tidak muncul saat tautan dibagikan.
+Robot WhatsApp tidak menjalankan JavaScript, jadi ini tidak bisa diisi otomatis.
+
+Cek hasilnya di [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/).
+
 ## Mengubah isi undangan
 
 | Yang diubah | Lokasi |
 |---|---|
 | Nama, tanggal, tempat, penceramah | `public/index.html` (bagian `#acara`) |
 | Tanggal & jam countdown / kalender | `EVENT_ISO` di `public/app.js` |
-| Titik lokasi Google Maps | link *Lihat Lokasi* di `public/index.html` |
+| Titik lokasi Google Maps | tombol *Lihat Lokasi* di `public/index.html` dan `MAPS_URL` di `public/app.js` |
+| Judul / tempat / catatan di kalender | `EVENT_TITLE`, `EVENT_PLACE`, `EVENT_NOTE` di `public/app.js` |
+| Alamat untuk preview WhatsApp | tiga baris `og:` di `<head>` `public/index.html` — **wajib alamat lengkap** |
 | Foto | ganti `public/foto-almarhumah.jpg`; atur `object-position` di CSS `.portrait__inner img` bila posisi wajah bergeser |
 | Teks share WhatsApp | fungsi `setupShare()` di `public/app.js` |
 
 ## Menjalankan di komputer sendiri
 
 ```bash
-npm i -g vercel
-vercel dev
+cp .env.example .env.local     # Windows: copy .env.example .env.local
+node dev-server.js             # buka http://localhost:3000
 ```
 
-Buka http://localhost:3000. Tanpa env var Upstash, form doa memakai mode
-`localStorage` seperti dijelaskan di atas.
+Tidak perlu `npm install` dan tidak perlu internet. Kalau kredensial Upstash di
+`.env.local` dikosongkan, `dev-server.js` memakai database tiruan di memori —
+semua fitur tetap bisa dicoba, datanya hilang saat server dimatikan.
+
+Isi `ADMIN_TOKEN` di `.env.local` untuk membuka `http://localhost:3000/admin.html`.
+Token yang tampil di banner saat server menyala adalah token yang sedang aktif.
+
+Ganti port: `node dev-server.js 4000`
+
+Beberapa catatan saat mencoba di lokal:
+
+- Batas kirim tetap berlaku: **5 doa per 5 menit**. Kalau kena `429`, tunggu
+  5 menit atau hentikan lalu jalankan ulang server (data ikut kosong lagi).
+- Buka `/api/doa?diag=1` untuk melihat env mana yang sudah terbaca.
+- `dev-server.js` hanya untuk lokal. Vercel tidak memakainya sama sekali.
+
+Kalau ingin memakai database Upstash sungguhan di lokal, salin nilainya dari
+Vercel (**Storage** &rarr; nama database &rarr; `.env.local`) ke `.env.local`.
+Bisa juga pakai `vercel dev` kalau Vercel CLI sudah terpasang.

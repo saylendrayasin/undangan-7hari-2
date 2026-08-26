@@ -143,7 +143,11 @@ module.exports = async function handler(req, res) {
       envFound: envFound,
       redisReachable: redisOk,
       redisError: redisError,
-      adminEnabled: Boolean(process.env.ADMIN_TOKEN)
+      adminEnabled: Boolean(process.env.ADMIN_TOKEN),
+      nodeVersion: process.version,
+      // fetch bawaan baru ada sejak Node 18. Kalau false, naikkan versi Node
+      // di Vercel: Settings > General > Node.js Version.
+      fetchAvailable: typeof fetch === 'function'
     });
     return;
   }
