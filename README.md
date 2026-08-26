@@ -22,20 +22,35 @@ Isi `assets-src/`:
 
 | File | Keterangan |
 |---|---|
-| `foto-almarhumah-asli.jpeg` | foto asli (baju & hijab merah) |
+| `foto-almarhumah-asli.jpeg` | foto asli (baju & hijab merah, latar lengkap) |
+| `foto-almarhumah-putih.jpg` | hasil langkah 1 — baju sudah putih, latar masih ada |
 | `undangan-cetak.jpeg` | scan undangan cetak, jadi acuan warna |
-| `whiten.mjs` | skrip yang mengubah baju & hijab merah jadi putih |
+| `whiten.mjs` | langkah 1: baju & hijab merah jadi putih |
+| `cutout.mjs` | langkah 2: buang latar, sisakan subjek + bunga |
 
-`public/foto-almarhumah.jpg` adalah hasil `whiten.mjs`. Kalau perlu diulang atau
-disetel ulang:
+Foto di undangan dibuat lewat dua langkah berurutan:
 
 ```bash
 npm i jpeg-js
-node assets-src/whiten.mjs assets-src/foto-almarhumah-asli.jpeg public/foto-almarhumah.jpg mask.jpg
+
+# 1. Putihkan baju & hijab
+node assets-src/whiten.mjs      assets-src/foto-almarhumah-asli.jpeg      assets-src/foto-almarhumah-putih.jpg      mask.jpg                                   # argumen ke-4 opsional: pratinjau area
+
+# 2. Buang latar (kursi, spanduk, meja, karpet)
+node assets-src/cutout.mjs
 ```
 
-Argumen ke-4 opsional: menghasilkan pratinjau area yang diputihkan (ditandai
-cyan) untuk mengecek kalau ada bagian yang kena padahal tidak seharusnya.
+`cutout.mjs` menghasilkan `hasil-dengan-bunga.jpg` dan `hasil-tanpa-bunga.jpg`.
+Salin salah satunya jadi `public/foto-almarhumah.jpg`. Yang terpasang sekarang
+adalah versi **dengan bunga**.
+
+Cara kerjanya: mask subjek dihitung dari foto **asli** yang bajunya masih
+merah — jauh lebih mudah dipisahkan dari latar — lalu diterapkan ke foto yang
+sudah diputihkan. Pada foto putih, baju dan sarung kursi sama-sama krem
+sehingga tidak bisa dibedakan lagi.
+
+> Jangan jalankan `cutout.mjs` dengan sumber `public/foto-almarhumah.jpg`.
+> File itu sudah berlatar krem, jadi hasilnya akan terproses dua kali.
 
 Tidak ada `npm install`, tidak ada framework, tidak ada backend terpisah.
 `api/doa.js` memanggil Upstash lewat REST API biasa, jadi Vercel bisa langsung
@@ -204,6 +219,7 @@ Cek hasilnya di [Facebook Sharing Debugger](https://developers.facebook.com/tool
 | Lama acara di kalender | `EVENT_HOURS` di `public/app.js` |
 | Alamat untuk preview WhatsApp | tiga baris `og:` di `<head>` `public/index.html` — **wajib alamat lengkap** |
 | Foto | ganti `public/foto-almarhumah.jpg`; atur `object-position` di CSS `.portrait__inner img` bila posisi wajah bergeser |
+| Latar foto | latar krem sudah menyatu di dalam file gambar (`#fffdf8`, sama dengan `--bg`). Jangan menambah `filter` pada `.portrait__inner img` — perubahan kontras sekecil apa pun memunculkan kotak samar di sekeliling foto |
 | Teks share WhatsApp | fungsi `setupShare()` di `public/app.js` |
 
 ## Menjalankan di komputer sendiri
