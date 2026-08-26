@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Admin &middot; Doa &amp; Ucapan</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%232b2620'/%3E%3Cpath d='M16 6l2.6 7.4L26 16l-7.4 2.6L16 26l-2.6-7.4L6 16l7.4-2.6z' fill='%23c9a24c'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Karla:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fffdf8;
+    --bg-alt: #faf4e6;
+    --ink: #2b2620;
+    --ink-soft: #4d4941;
+    --ink-mute: #8d857a;
+    --gold: #c9a24c;
+    --gold-deep: #a9822f;
+    --line: #eee2c9;
+    --field: #e6dcc4;
+    --danger: #a4443c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); }
+  body { font-family: 'Karla', system-ui, sans-serif; color: var(--ink-soft); line-height: 1.6; }
+  .shell { max-width: 780px; margin: 0 auto; padding: clamp(28px, 5vw, 56px) clamp(18px, 4vw, 32px) 80px; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+  h1 { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; font-size: clamp(26px, 4vw, 36px); color: var(--ink); }
+  .sub { margin-top: 6px; font-size: 13px; color: var(--ink-mute); }
+  .sub a { color: var(--gold-deep); }
+
+  .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--bg); padding: clamp(18px, 3vw, 26px); }
+  label { display: block; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 8px; }
+  input[type=password], input[type=text] {
+    width: 100%; min-height: 48px; padding: 0 14px; font: inherit; color: var(--ink);
+    border: 1px solid var(--field); border-radius: 10px; background: #fffefb; outline: none;
+  }
+  input:focus { border-color: var(--gold); }
+
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .row > form, .row > * { min-width: 0; }
+  button {
+    font: inherit; font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    min-height: 44px; padding: 0 20px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--gold); background: var(--gold); color: var(--bg);
+    transition: background .2s ease, color .2s ease, border-color .2s ease;
+  }
+  button:hover { background: #b4893c; border-color: #b4893c; }
+  button.ghost { background: transparent; color: var(--ink-mute); border-color: var(--field); }
+  button.ghost:hover { color: var(--gold-deep); border-color: var(--gold); background: transparent; }
+  button.danger { background: transparent; color: var(--danger); border-color: #e3c4c0; padding: 0 16px; min-height: 38px; }
+  button.danger:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+  button[disabled] { opacity: .5; cursor: default; }
+
+  .msg { margin-top: 14px; font-size: 13.5px; }
+  .msg.err { color: var(--danger); }
+  .msg.ok { color: #4a7c59; }
+
+  .bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+  .count { font-size: 13px; color: var(--ink-mute); }
+
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  li { border: 1px solid var(--line); border-radius: 14px; background: var(--bg); padding: 16px 18px; }
+  .head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; justify-content: space-between; }
+  .name { font-weight: 600; color: var(--ink); font-size: 14.5px; }
+  .when { font-size: 11.5px; color: var(--ink-mute); white-space: nowrap; }
+  .text { margin: 10px 0 14px; white-space: pre-wrap; font-size: 14.5px; }
+  .id { font-size: 11px; color: #b8ae9c; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  li.gone { opacity: .4; }
+
+  .empty { border: 1px dashed var(--field); border-radius: 14px; padding: 40px 20px; text-align: center; color: var(--ink-mute); }
+  .hide { display: none; }
+  .note { margin-top: 26px; font-size: 12.5px; color: var(--ink-mute); border-top: 1px solid var(--line); padding-top: 18px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <h1>Kelola Doa &amp; Ucapan</h1>
+    <div class="sub">Undangan Takziah Hari Ke-7 &middot; <a href="/">lihat undangan</a></div>
+  </header>
+
+  <section class="panel" id="login">
+    <form id="login-form">
+      <label for="token">Token Admin</label>
+      <div class="row">
+        <input type="password" id="token" autocomplete="current-password" placeholder="ADMIN_TOKEN" style="flex:1 1 240px" />
+        <button type="submit" id="login-btn">Masuk</button>
+      </div>
+      <div class="msg" id="login-msg"></div>
+    </form>
+  </section>
+
+  <section id="board" class="hide">
+    <div class="bar">
+      <div class="count" id="count"></div>
+      <div class="row">
+        <button type="button" class="ghost" id="refresh">Muat Ulang</button>
+        <button type="button" class="ghost" id="logout">Keluar</button>
+      </div>
+    </div>
+    <div id="list"></div>
+    <div class="msg" id="board-msg"></div>
+    <p class="note">
+      Menghapus doa bersifat permanen dan langsung hilang dari halaman undangan.
+      Token admin hanya tersimpan di browser ini selama tab terbuka.
+    </p>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+  var token = '';
+
+  function fmt(ts) {
+    var d = new Date(ts || 0);
+    if (isNaN(d.getTime()) || !ts) return '';
+    return d.toLocaleString('id-ID', {
+      day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  function say(el, text, kind) {
+    el.textContent = text || '';
+    el.className = 'msg' + (kind ? ' ' + kind : '');
+  }
+
+  function load(showBusy) {
+    if (showBusy) say($('board-msg'), 'Memuat…', '');
+    return fetch('/api/doa', { headers: { 'x-admin-token': token, Accept: 'application/json' } })
+      .then(function (res) {
+        return res.json().then(function (data) { return { status: res.status, data: data }; });
+      })
+      .then(function (r) {
+        if (!r.data.ok) throw new Error(r.data.error || 'Gagal memuat.');
+        render(r.data.list || [], r.data.total || 0);
+        say($('board-msg'), '', '');
+        return true;
+      });
+  }
+
+  function render(list, total) {
+    $('count').textContent = total + ' doa & ucapan tersimpan';
+    var host = $('list');
+    host.textContent = '';
+
+    if (!list.length) {
+      var empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'Belum ada doa yang masuk.';
+      host.appendChild(empty);
+      return;
+    }
+
+    var ul = document.createElement('ul');
+    list.forEach(function (item) {
+      var li = document.createElement('li');
+
+      var head = document.createElement('div');
+      head.className = 'head';
+      var name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = item.name || 'Tanpa Nama';
+      var when = document.createElement('div');
+      when.className = 'when';
+      when.textContent = fmt(item.ts);
+      head.appendChild(name);
+      head.appendChild(when);
+
+      var text = document.createElement('div');
+      text.className = 'text';
+      text.textContent = item.text;
+
+      var foot = document.createElement('div');
+      foot.className = 'head';
+      var id = document.createElement('span');
+      id.className = 'id';
+      id.textContent = item.id || '(tanpa id)';
+      var del = document.createElement('button');
+      del.className = 'danger';
+      del.type = 'button';
+      del.textContent = 'Hapus';
+      del.disabled = !item.id;
+      del.addEventListener('click', function () { remove(item, li, del); });
+      foot.appendChild(id);
+      foot.appendChild(del);
+
+      li.appendChild(head);
+      li.appendChild(text);
+      li.appendChild(foot);
+      ul.appendChild(li);
+    });
+    host.appendChild(ul);
+  }
+
+  function remove(item, li, button) {
+    var who = item.name || 'Tanpa Nama';
+    if (!window.confirm('Hapus doa dari "' + who + '"?\n\nTindakan ini permanen.')) return;
+
+    button.disabled = true;
+    button.textContent = 'Menghapus…';
+    li.classList.add('gone');
+
+    fetch('/api/doa', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ id: item.id })
+    })
+      .then(function (res) {
+        return res.json().then(function (data) { return { status: res.status, data: data }; });
+      })
+      .then(function (r) {
+        if (!r.data.ok) throw new Error(r.data.error || 'Gagal menghapus.');
+        return load(false).then(function () {
+          say($('board-msg'), 'Doa dari "' + who + '" sudah dihapus.', 'ok');
+        });
+      })
+      .catch(function (err) {
+        li.classList.remove('gone');
+        button.disabled = false;
+        button.textContent = 'Hapus';
+        say($('board-msg'), err.message, 'err');
+      });
+  }
+
+  function openBoard() {
+    $('login').classList.add('hide');
+    $('board').classList.remove('hide');
+  }
+
+  $('login-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var button = $('login-btn');
+    token = $('token').value.trim();
+    if (!token) {
+      say($('login-msg'), 'Masukkan token admin.', 'err');
+      return;
+    }
+    button.disabled = true;
+    say($('login-msg'), 'Memeriksa…', '');
+
+    load(false)
+      .then(function () {
+        try { sessionStorage.setItem('takziah-admin', token); } catch (e2) { /* private mode */ }
+        say($('login-msg'), '', '');
+        openBoard();
+      })
+      .catch(function (err) {
+        token = '';
+        say($('login-msg'), err.message, 'err');
+      })
+      .then(function () { button.disabled = false; });
+  });
+
+  $('refresh').addEventListener('click', function () {
+    load(true).catch(function (err) { say($('board-msg'), err.message, 'err'); });
+  });
+
+  $('logout').addEventListener('click', function () {
+    token = '';
+    try { sessionStorage.removeItem('takziah-admin'); } catch (e) { /* ignore */ }
+    $('board').classList.add('hide');
+    $('login').classList.remove('hide');
+    $('token').value = '';
+    say($('login-msg'), '', '');
+  });
+
+  // Resume a session after a reload without asking for the token again.
+  var saved = '';
+  try { saved = sessionStorage.getItem('takziah-admin') || ''; } catch (e) { /* ignore */ }
+  if (saved) {
+    token = saved;
+    load(false)
+      .then(openBoard)
+      .catch(function () {
+        token = '';
+        try { sessionStorage.removeItem('takziah-admin'); } catch (e2) { /* ignore */ }
+      });
+  }
+})();
+</script>
+</body>
+</html>
