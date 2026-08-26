@@ -111,10 +111,9 @@ function runCommand(cmd) {
   }
 }
 
-const hasRealRedis = Boolean(
-  (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) ||
-  (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN)
-);
+const hasRealRedis = Object.keys(process.env).some(function (n) {
+  return /(^|_)(KV_REST_API_URL|UPSTASH_REDIS_REST_URL)$/.test(n) && process.env[n];
+});
 
 let stub = null;
 
@@ -138,8 +137,11 @@ function startStub() {
     });
     stub.listen(0, '127.0.0.1', function () {
       const url = 'http://127.0.0.1:' + stub.address().port;
-      process.env.KV_REST_API_URL = url;
-      process.env.KV_REST_API_TOKEN = 'local-dev';
+      // UJI_PREFIX meniru awalan yang ditambahkan Vercel, mis. takziah_
+      const prefix = process.env.UJI_PREFIX || '';
+      process.env[prefix + 'KV_REST_API_URL'] = url;
+      process.env[prefix + 'KV_REST_API_TOKEN'] = 'local-dev';
+      if (prefix) process.env[prefix + 'KV_REST_API_READ_ONLY_TOKEN'] = 'local-dev-readonly';
       resolve();
     });
   });

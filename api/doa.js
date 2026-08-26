@@ -19,10 +19,39 @@ const RATE_WINDOW = 300; // ...per 5 minutes
 const ADMIN_FAIL_LIMIT = 10; // wrong admin tokens per IP...
 const ADMIN_FAIL_WINDOW = 900; // ...per 15 minutes
 
+// Nama variabel yang dipakai Upstash, berpasangan (url, token).
+const CREDENTIAL_PAIRS = [
+  ['KV_REST_API_URL', 'KV_REST_API_TOKEN'],
+  ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN']
+];
+
+// Vercel menambahkan awalan kalau diminta saat menyambungkan database
+// (misalnya takziah_KV_REST_API_URL), jadi nama persisnya tidak bisa
+// dipastikan. Cari pasangan tanpa awalan dulu, lalu pasangan berawalan —
+// dan pastikan url dan token berasal dari awalan yang sama.
 function credentials() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
-  return url && token ? { url: url.replace(/\/+$/, ''), token } : null;
+  const env = process.env;
+
+  for (const [urlName, tokenName] of CREDENTIAL_PAIRS) {
+    if (env[urlName] && env[tokenName]) {
+      return { url: env[urlName].replace(/\/+$/, ''), token: env[tokenName], urlName, tokenName };
+    }
+  }
+
+  // Token READ_ONLY tidak bisa menulis doa, jadi jangan pernah dipilih.
+  const names = Object.keys(env).filter((n) => !/READ_ONLY/.test(n) && env[n]);
+
+  for (const [urlSuffix, tokenSuffix] of CREDENTIAL_PAIRS) {
+    const urlName = names.find((n) => n.endsWith('_' + urlSuffix));
+    if (!urlName) continue;
+    const prefix = urlName.slice(0, urlName.length - urlSuffix.length);
+    const tokenName = prefix + tokenSuffix;
+    if (env[tokenName]) {
+      return { url: env[urlName].replace(/\/+$/, ''), token: env[tokenName], urlName, tokenName };
+    }
+  }
+
+  return null;
 }
 
 async function pipeline(creds, commands) {
@@ -124,9 +153,11 @@ module.exports = async function handler(req, res) {
   // Deployment self-check. Reports which credential env vars the function can
   // see — names and booleans only, never a value.
   if (req.method === 'GET' && /[?&]diag=1(&|$)/.test(req.url || '')) {
-    const names = ['KV_REST_API_URL', 'KV_REST_API_TOKEN', 'UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN', 'ADMIN_TOKEN'];
-    const envFound = {};
-    names.forEach(function (n) { envFound[n] = Boolean(process.env[n]); });
+    // Daftar nama variabel bergaya Upstash yang terlihat oleh fungsi ini,
+    // termasuk yang berawalan. Hanya NAMA — nilainya tidak pernah ditampilkan.
+    const envFound = Object.keys(process.env)
+      .filter(function (n) { return /KV_REST_API|UPSTASH_REDIS/.test(n); })
+      .sort();
 
     let redisOk = false;
     let redisError = null;
@@ -141,6 +172,9 @@ module.exports = async function handler(req, res) {
       ok: true,
       storage: creds ? 'redis' : 'none',
       envFound: envFound,
+      // Pasangan mana yang akhirnya dipakai — berguna kalau ada beberapa.
+      usingUrlVar: creds ? creds.urlName : null,
+      usingTokenVar: creds ? creds.tokenName : null,
       redisReachable: redisOk,
       redisError: redisError,
       adminEnabled: Boolean(process.env.ADMIN_TOKEN),

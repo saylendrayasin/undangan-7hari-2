@@ -63,14 +63,23 @@ Setelah ini undangan sudah bisa dibuka. Form doa juga sudah jalan, hanya saja
 doa masih tersimpan di HP masing-masing tamu — lanjut ke langkah 2 supaya
 tersimpan bersama.
 
-### 2. Sambungkan database (gratis)
+### 2. Sambungkan database
 
-1. Buka project di dashboard Vercel → tab **Storage** → **Create Database**.
-2. Pilih **Upstash → Redis**, ikuti sampai selesai (paket gratis cukup).
+1. Buka project di dashboard Vercel → tab **Storage**.
+2. **Create Database** → **Redis** → **Upstash**, atau **Connect Store** kalau
+   sudah punya database Upstash dari project lain.
 3. Pada langkah **Connect Project**, pilih project undangan ini.
 
-Vercel otomatis menambahkan `KV_REST_API_URL` dan `KV_REST_API_TOKEN` ke
-project. **Tidak perlu menyalin apa pun secara manual.**
+Vercel mengisi sendiri env var-nya. **Tidak perlu menyalin apa pun.**
+
+Boleh memakai awalan (*prefix*) saat menyambungkan — misalnya `takziah`,
+sehingga variabelnya jadi `takziah_KV_REST_API_URL`. Kode sudah mengenali
+awalan apa pun secara otomatis.
+
+> **Paket Free Upstash umumnya hanya satu database per akun.** Kalau pilihan
+> Free tidak muncul karena sudah terpakai project lain, sambungkan saja
+> database yang sudah ada — semua kunci di proyek ini berawalan `takziah:`
+> sehingga tidak bentrok dengan data project lain.
 
 > Panduan deploy lengkap langkah demi langkah lewat UI Vercel (tanpa terminal),
 > berikut daftar cek dan solusi masalah, tersedia sebagai halaman terpisah:
@@ -95,7 +104,15 @@ UPSTASH_REDIS_REST_URL=https://xxxx.upstash.io
 UPSTASH_REDIS_REST_TOKEN=xxxxxxxx
 ```
 
-Keduanya sama-sama dikenali oleh `api/doa.js`.
+`api/doa.js` mengenali keempat nama berikut, dengan atau tanpa awalan:
+
+| | |
+|---|---|
+| `KV_REST_API_URL` | `KV_REST_API_TOKEN` |
+| `UPSTASH_REDIS_REST_URL` | `UPSTASH_REDIS_REST_TOKEN` |
+
+Jadi `takziah_KV_REST_API_URL` atau awalan lain juga terbaca. Token
+`..._READ_ONLY_TOKEN` sengaja diabaikan karena tidak bisa menyimpan doa.
 
 ## Kalau database belum tersambung
 
