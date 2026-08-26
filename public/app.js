@@ -1,5 +1,5 @@
 /* Undangan Takziah Hari Ke-7 — front-end behaviour.
-   Countdown, .ics download, share actions, and the "Ucapan & Doa" guestbook.
+   Countdown, calendar link, share actions, and the "Ucapan & Doa" guestbook.
    The guestbook talks to /api/doa (Upstash Redis). If that endpoint is not
    reachable or no database is connected yet, it degrades to localStorage so
    the page never looks broken to a guest. */
@@ -72,7 +72,7 @@
     clearInterval(countdownTimer);
   }
 
-  /* ---------------- Calendar file ---------------- */
+  /* ---------------- Calendar ---------------- */
 
   // Waktu UTC dengan format yang dipakai iCalendar dan Google Calendar.
   function stampUtc(d) {
@@ -80,54 +80,15 @@
   }
 
   function buildCalendar() {
-    // Google Calendar: paling andal di HP, karena terbuka langsung di aplikasi
-    // atau browser tanpa perlu mengunduh berkas.
-    var gcal = 'https://calendar.google.com/calendar/render' +
+    // Google Calendar terbuka langsung di aplikasi atau browser, tanpa perlu
+    // mengunduh berkas — cara paling andal di HP, termasuk dari WhatsApp.
+    $('gcal').href = 'https://calendar.google.com/calendar/render' +
       '?action=TEMPLATE' +
       '&text=' + encodeURIComponent(EVENT_TITLE) +
       '&dates=' + stampUtc(EVENT_AT) + '/' + stampUtc(EVENT_END) +
       '&details=' + encodeURIComponent(EVENT_NOTE + '\n\nLokasi: ' + MAPS_URL) +
       '&location=' + encodeURIComponent(EVENT_PLACE) +
       '&ctz=Asia/Makassar';
-    $('gcal').href = gcal;
-
-    // Berkas .ics untuk iPhone, Outlook, dan aplikasi kalender lain.
-    // Baris DESCRIPTION harus di-escape sesuai aturan iCalendar.
-    var esc = function (text) {
-      return String(text).replace(/\\/g, '\\\\').replace(/;/g, '\\;')
-        .replace(/,/g, '\\,').replace(/\n/g, '\\n');
-    };
-    var lines = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//Undangan Takziah//ID',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH',
-      'BEGIN:VEVENT',
-      'UID:takziah-7-nurhaeda-yasin@undangan',
-      'DTSTAMP:' + stampUtc(new Date()),
-      'DTSTART:' + stampUtc(EVENT_AT),
-      'DTEND:' + stampUtc(EVENT_END),
-      'SUMMARY:' + esc(EVENT_TITLE),
-      'LOCATION:' + esc(EVENT_PLACE),
-      'DESCRIPTION:' + esc(EVENT_NOTE + '\nLokasi: ' + MAPS_URL),
-      'BEGIN:VALARM',
-      'TRIGGER:-PT2H',
-      'ACTION:DISPLAY',
-      'DESCRIPTION:' + esc(EVENT_TITLE),
-      'END:VALARM',
-      'END:VEVENT',
-      'END:VCALENDAR'
-    ].join('\r\n');
-
-    // Blob lebih dapat diandalkan daripada data: URI pada Safari dan
-    // browser di dalam aplikasi seperti WhatsApp.
-    var link = $('ics');
-    if (typeof Blob !== 'undefined' && window.URL && window.URL.createObjectURL) {
-      link.href = URL.createObjectURL(new Blob([lines], { type: 'text/calendar;charset=utf-8' }));
-    } else {
-      link.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(lines);
-    }
   }
 
   /* ---------------- Share ---------------- */

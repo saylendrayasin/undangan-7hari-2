@@ -184,6 +184,7 @@ Cek hasilnya di [Facebook Sharing Debugger](https://developers.facebook.com/tool
 | Tanggal & jam countdown / kalender | `EVENT_ISO` di `public/app.js` |
 | Titik lokasi Google Maps | tombol *Lihat Lokasi* di `public/index.html` dan `MAPS_URL` di `public/app.js` |
 | Judul / tempat / catatan di kalender | `EVENT_TITLE`, `EVENT_PLACE`, `EVENT_NOTE` di `public/app.js` |
+| Lama acara di kalender | `EVENT_HOURS` di `public/app.js` |
 | Alamat untuk preview WhatsApp | tiga baris `og:` di `<head>` `public/index.html` — **wajib alamat lengkap** |
 | Foto | ganti `public/foto-almarhumah.jpg`; atur `object-position` di CSS `.portrait__inner img` bila posisi wajah bergeser |
 | Teks share WhatsApp | fungsi `setupShare()` di `public/app.js` |

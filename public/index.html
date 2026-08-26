@@ -153,7 +153,6 @@
   .btn--solid { border: 1px solid var(--gold); background: var(--gold); color: var(--bg); }
   .btn--solid:hover { background: #b4893c; border-color: #b4893c; }
   .btn[disabled] { opacity: .55; cursor: progress; }
-  .btn--small { padding: 0 18px; font-size: 9.5px; letter-spacing: .16em; }
 
   .countdown { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: clamp(20px, 3vw, 30px); background: var(--bg-alt); padding: clamp(26px, 4vw, 40px) clamp(18px, 3vw, 32px); text-align: center; }
   .countdown__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(6px, 1vw, 12px); }
@@ -183,13 +182,17 @@
   .doa__meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
   .doa__count { font-size: clamp(11px, 1.1vw, 12.5px); letter-spacing: .12em; color: var(--ink-mute); }
   .doa__hint { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #c0b6a2; }
-  .doa__list { margin-top: 12px; display: grid; gap: 10px; max-height: clamp(320px, 46vh, 460px); overflow-y: auto; padding-right: 4px; }
+  /* grid-template-columns wajib minmax(0,...): tanpa itu, satu kata yang
+     sangat panjang memaksa kolomnya melebar dan merusak seluruh halaman. */
+  .doa__list { margin-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; max-height: clamp(320px, 46vh, 460px); overflow-y: auto; padding-right: 4px; }
   .doa__empty { border: 1px dashed var(--field-line); border-radius: 16px; padding: clamp(28px, 4vw, 44px) 20px; text-align: center; font-family: var(--serif); font-style: italic; font-size: clamp(16px, 1.6vw, 19px); color: var(--ink-faint); }
-  .doa-item { border: 1px solid var(--card-line); border-radius: 16px; background: var(--bg); padding: clamp(16px, 2vw, 22px); animation: softIn .5s ease both; }
-  .doa-item__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-  .doa-item__name { font-weight: 600; font-size: 13.5px; letter-spacing: .02em; color: var(--ink); }
+  .doa-item { min-width: 0; border: 1px solid var(--card-line); border-radius: 16px; background: var(--bg); padding: clamp(16px, 2vw, 22px); animation: softIn .5s ease both; }
+  .doa-item__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+  .doa-item__name { min-width: 0; font-weight: 600; font-size: 13.5px; letter-spacing: .02em; color: var(--ink); overflow-wrap: anywhere; }
   .doa-item__when { font-size: 10.5px; color: #b0a795; white-space: nowrap; }
-  .doa-item__text { margin-top: 8px; font-size: clamp(14px, 1.3vw, 15.5px); line-height: 1.85; color: var(--ink-soft); text-wrap: pretty; white-space: pre-wrap; }
+  /* overflow-wrap: anywhere memotong kata yang tidak punya spasi sama sekali
+     (teks "aaaa..." atau tautan panjang) supaya tetap ikut lebar kartu. */
+  .doa-item__text { min-width: 0; margin-top: 8px; font-size: clamp(14px, 1.3vw, 15.5px); line-height: 1.85; color: var(--ink-soft); text-wrap: pretty; white-space: pre-wrap; overflow-wrap: anywhere; }
   .spinner { display: inline-block; width: 11px; height: 11px; border: 1.5px solid var(--field-line); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -1px; }
 
   /* ---------- Penutup ---------- */
@@ -290,8 +293,7 @@
         </div>
         <div class="actions acara__actions">
           <a class="btn btn--gold" href="https://maps.app.goo.gl/VYpwPbzHdaEHzKU2A" target="_blank" rel="noopener">Lihat Lokasi</a>
-          <a class="btn btn--gold" id="gcal" href="#" target="_blank" rel="noopener">Google Kalender</a>
-          <a class="btn btn--ghost btn--small" id="ics" download="takziah-7-hari.ics" href="#">Unduh .ics</a>
+          <a class="btn btn--gold" id="gcal" href="#" target="_blank" rel="noopener">Simpan ke Kalender</a>
         </div>
       </div>
       <div class="card countdown">
