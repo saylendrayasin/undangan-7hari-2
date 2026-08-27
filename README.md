@@ -62,10 +62,8 @@ Setelan di bagian atas `potong.mjs`: `JENDELA` (ukuran jendela ukur),
 
 ### Hiasan bunga
 
-Ada tiga rangkaian di sekeliling bingkai lengkung: besar di tengah bawah,
-kecil di kiri atas, dan cerminannya di kanan atas.
-
-Setiap rangkaian menggabungkan dua bahan:
+Ada satu rangkaian, di tengah bawah bingkai lengkung. Rangkaian itu
+menggabungkan dua bahan:
 
 | Bagian | Asal |
 |---|---|
@@ -94,9 +92,8 @@ warna, terang ~239 dan saturasi < 0,05), membuang bercak usia, menyelaraskan
 warnanya ke palet undangan (`TURUN_SATURASI`, `TARIK_KE_KREM`), lalu menulis
 PNG bertransparansi. Bagian mana yang dipotong diatur lewat `POTONGAN`.
 
-Mengubah tata letaknya: `.bunga--bawah` / `.bunga--kiri` / `.bunga--kanan`
-untuk posisi dan ukuran, atau `<image>` dan `<use>` di dalam tiap rangkaian
-untuk susunannya.
+Mengubah tata letaknya: `.bunga--bawah` untuk posisi dan ukuran, atau
+`<image>` dan `<use>` di dalam rangkaian itu untuk susunannya.
 
 > Aset bunga siap pakai juga sempat dicoba dari FreeSVG dan koleksi ornamen
 > Wikimedia. Yang berlisensi bebas ternyata berupa ornamen Art Nouveau
