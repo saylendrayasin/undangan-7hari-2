@@ -22,35 +22,44 @@ Isi `assets-src/`:
 
 | File | Keterangan |
 |---|---|
-| `foto-almarhumah-asli.jpeg` | foto asli (baju & hijab merah, latar lengkap) |
-| `foto-almarhumah-putih.jpg` | hasil langkah 1 — baju sudah putih, latar masih ada |
-| `undangan-cetak.jpeg` | scan undangan cetak, jadi acuan warna |
-| `whiten.mjs` | langkah 1: baju & hijab merah jadi putih |
-| `cutout.mjs` | langkah 2: buang latar, sisakan subjek + bunga |
+| `foto-studio-asli.jpeg` | **foto yang dipakai sekarang** — hasil studio, latar abu polos |
+| `studio.mjs` | membuang latar studio dan menyusunnya ke bingkai 4:5 |
+| `undangan-cetak.jpeg` | scan undangan cetak, acuan warna |
+| `foto-almarhumah-asli.jpeg` | foto lama (baju merah, latar acara) — arsip |
+| `foto-almarhumah-putih.jpg` | foto lama setelah baju diputihkan — arsip |
+| `whiten.mjs` | skrip lama: baju & hijab merah jadi putih — arsip |
+| `cutout.mjs` | skrip lama: buang latar acara — arsip |
 
-Foto di undangan dibuat lewat dua langkah berurutan:
+Foto yang terpasang dibuat dengan:
 
 ```bash
 npm i jpeg-js
-
-# 1. Putihkan baju & hijab
-node assets-src/whiten.mjs      assets-src/foto-almarhumah-asli.jpeg      assets-src/foto-almarhumah-putih.jpg      mask.jpg                                   # argumen ke-4 opsional: pratinjau area
-
-# 2. Buang latar (kursi, spanduk, meja, karpet)
-node assets-src/cutout.mjs
+node assets-src/studio.mjs        # -> studio-hasil.jpg
+cp studio-hasil.jpg public/foto-almarhumah.jpg
 ```
 
-`cutout.mjs` menghasilkan `hasil-dengan-bunga.jpg` dan `hasil-tanpa-bunga.jpg`.
-Salin salah satunya jadi `public/foto-almarhumah.jpg`. Yang terpasang sekarang
-adalah versi **dengan bunga**.
+Cara kerjanya: latar studio dimodelkan sebagai permukaan kuadratik (vignet
+dua dimensi), lalu piksel yang menyimpang dari model dianggap subjek.
 
-Cara kerjanya: mask subjek dihitung dari foto **asli** yang bajunya masih
-merah — jauh lebih mudah dipisahkan dari latar — lalu diterapkan ke foto yang
-sudah diputihkan. Pada foto putih, baju dan sarung kursi sama-sama krem
-sehingga tidak bisa dibedakan lagi.
+> **Batasnya:** di rok bagian bawah, beda terang antara kain dan latar hanya
+> 4-5 tingkat — tidak ada cara otomatis yang bisa memisahkannya. Karena itu
+> subjek hanya dipotong sampai sekitar pinggul, lalu bawahnya dilarutkan ke
+> krem (`LARUT_MULAI`). Rangkaian bunga di halaman duduk tepat di area larut
+> itu, jadi peralihannya terbaca sebagai komposisi.
 
-> Jangan jalankan `cutout.mjs` dengan sumber `public/foto-almarhumah.jpg`.
-> File itu sudah berlatar krem, jadi hasilnya akan terproses dua kali.
+Setelan yang sering perlu diubah, semuanya di bagian atas `studio.mjs`:
+`AMBANG` (kepekaan pemisahan), `LARUT_MULAI` (tinggi mulai larut),
+`POTONG` (bingkai akhir), dan `LAJUR_KIRI`/`kananLajur` (batas kiri-kanan).
+
+### Hiasan bunga
+
+Bunga di sekeliling bingkai lengkung adalah **SVG di dalam `index.html`**,
+bukan gambar — tetap tajam di layar mana pun dan ukurannya hanya beberapa
+kilobita. Ada tiga: satu besar di tengah bawah, satu di kiri atas, satu di
+kanan atas (yang kanan adalah cerminan yang kiri lewat `scaleX(-1)`).
+
+Mengubahnya: cari `.portrait__bunga` untuk posisi dan ukuran, atau `#kelopak`
+/ `#daun` / `#kuncup` di dalam `<defs>` untuk bentuk dan warnanya.
 
 Tidak ada `npm install`, tidak ada framework, tidak ada backend terpisah.
 `api/doa.js` memanggil Upstash lewat REST API biasa, jadi Vercel bisa langsung
