@@ -49,8 +49,13 @@ meredup lalu hilang — jadi simpangan baku lokal berbanding lurus dengan
 tanpa perlu menebak letak grid (yang memang tidak konsisten karena gambarnya
 pernah diubah ukuran: periodenya 15,2 mendatar dan 15,9 tegak).
 
-Warna tepi yang masih tercampur warna kotak dibatalkan dengan
-`S = (I - (1-a)*C) / a`. Tanpa langkah itu tersisa garis abu tipis di siluet.
+Warna di pita tepi **tidak dihitung, melainkan diambil** dari piksel subjek
+murni terdekat lalu dirambatkan ke luar. Membatalkan campuran secara hitungan
+sempat dicoba dan gagal: nilai kotaknya berselang-seling 255 dan 191, sehingga
+memakai rata-ratanya menyisakan rigi-rigi kecil sepanjang siluet, sedangkan
+menebak petaknya kadang meleset dan menyisakan pinggiran terang. Dengan
+mengambil warna dari subjek, tidak ada warna kotak yang mungkin tersisa —
+yang melandai hanya alphanya.
 
 Setelan di bagian atas `potong.mjs`: `JENDELA` (ukuran jendela ukur),
 `LARUT_MULAI` (tinggi mulai dilarutkan ke krem), dan `POTONG` (bingkai akhir).

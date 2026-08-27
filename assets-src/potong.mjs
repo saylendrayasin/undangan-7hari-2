@@ -214,10 +214,49 @@ console.log(JSON.stringify({
 }, null, 1));
 
 /* ---------- 4. gabungkan ke krem ----------
-   Warna tepi masih tercampur warna kotak. Karena alpha sudah diketahui,
-   campuran itu bisa dibatalkan: S = (I - (1-a)*C) / a, dengan C rata-rata
-   pola (223). Tanpa langkah ini tersisa garis abu tipis di siluet. */
-const C_POLA = (255 + 191) / 2;
+   Piksel di pita tepi adalah campuran subjek dengan warna kotak, jadi
+   warnanya tidak bisa dipakai apa adanya. Membatalkan campuran secara
+   hitungan juga tidak bisa diandalkan: nilai kotaknya berselang-seling
+   255 dan 191, dan salah menebak petak menyisakan rigi-rigi atau
+   pinggiran terang di sekeliling badan.
+
+   Karena itu warna di pita tepi tidak dihitung, melainkan DIAMBIL dari
+   piksel subjek murni terdekat lalu dirambatkan ke luar. Dengan begitu
+   tidak ada warna kotak yang mungkin tersisa; yang melandai hanya
+   alphanya, sehingga tepinya larut bersih ke krem halaman. */
+const warnaSubjek = new Float32Array(N * 3);
+const tahu = new Uint8Array(N);
+for (let p = 0; p < N; p++) {
+  if (alpha[p] > 0.9) {
+    tahu[p] = 1;
+    for (let c = 0; c < 3; c++) warnaSubjek[p * 3 + c] = D[p * 4 + c];
+  }
+}
+
+{
+  let depan = [];
+  for (let p = 0; p < N; p++) if (tahu[p]) depan.push(p);
+  const JANGKAUAN = JENDELA + 8;
+  for (let putaran = 0; putaran < JANGKAUAN && depan.length; putaran++) {
+    const berikut = [];
+    for (const p of depan) {
+      const x = p % W, y = (p / W) | 0;
+      const tetangga = [];
+      if (x > 0) tetangga.push(p - 1);
+      if (x < W - 1) tetangga.push(p + 1);
+      if (y > 0) tetangga.push(p - W);
+      if (y < H - 1) tetangga.push(p + W);
+      for (const q of tetangga) {
+        if (tahu[q] || alpha[q] <= 0) continue;
+        tahu[q] = 2;
+        for (let c = 0; c < 3; c++) warnaSubjek[q * 3 + c] = warnaSubjek[p * 3 + c];
+        berikut.push(q);
+      }
+    }
+    depan = berikut;
+  }
+}
+
 const ramp = (v, a, b) => Math.min(1, Math.max(0, (v - a) / (b - a)));
 const LARUT_MULAI = Number(process.env.LARUT || 1000);
 const LARUT_SELESAI = Number(process.env.LARUT_AKHIR || 1112);
@@ -227,15 +266,10 @@ for (let y = 0; y < H; y++) {
   const larut = 1 - ramp(y, LARUT_MULAI, LARUT_SELESAI);
   for (let x = 0; x < W; x++) {
     const p = y * W + x, i = p * 4;
-    const a = alpha[p];
+    const ef = alpha[p] * larut;
     for (let c = 0; c < 3; c++) {
-      let subjekWarna = D[i + c];
-      if (a > 0.02 && a < 0.98) {
-        subjekWarna = (D[i + c] - (1 - a) * C_POLA) / a;
-        subjekWarna = Math.min(255, Math.max(0, subjekWarna));
-      }
-      const ef = a * larut;
-      rata[i + c] = Math.round(KREM[c] + (subjekWarna - KREM[c]) * ef);
+      const S = tahu[p] ? warnaSubjek[p * 3 + c] : D[i + c];
+      rata[i + c] = Math.round(KREM[c] + (S - KREM[c]) * ef);
     }
     rata[i + 3] = 255;
   }
