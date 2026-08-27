@@ -24,6 +24,7 @@ Isi `assets-src/`:
 |---|---|
 | `foto-potong-asli.jpeg` | **foto yang dipakai sekarang** — sudah dipotong alat penghapus latar |
 | `potong.mjs` | menghapus pola kotak transparansi dan menyusun ke bingkai 4:5 |
+| `botani.mjs` | memotong kuntum mawar dari plat botani jadi PNG transparan |
 | `undangan-cetak.jpeg` | scan undangan cetak, acuan warna |
 | `foto-studio-asli.jpeg`, `studio.mjs` | percobaan sebelumnya (latar studio abu) — arsip |
 | `foto-almarhumah-asli.jpeg`, `foto-almarhumah-putih.jpg` | foto lama berbaju merah — arsip |
@@ -56,23 +57,46 @@ Setelan di bagian atas `potong.mjs`: `JENDELA` (ukuran jendela ukur),
 
 ### Hiasan bunga
 
-Bunga di sekeliling bingkai lengkung adalah **SVG yang digambar tangan di
-dalam `index.html`**, bukan gambar unduhan. Ada tiga rangkaian: besar di
-tengah bawah, kecil di kiri atas, dan cerminannya di kanan atas.
+Ada tiga rangkaian di sekeliling bingkai lengkung: besar di tengah bawah,
+kecil di kiri atas, dan cerminannya di kanan atas.
 
-Bentuk dasarnya didefinisikan sekali lalu dipakai ulang: `#mawar` (tiga lapis
-kelopak), `#peoni`, `#bungaKecil` (berbenang sari), `#kuncup`, `#ranting`
-(daun bulat gaya eukaliptus), dan `#daun`.
+Setiap rangkaian menggabungkan dua bahan:
 
-> Aset bunga siap pakai dari luar sempat dicoba — FreeSVG dan Wikimedia
-> Commons. Yang berlisensi bebas dan bisa diunduh ternyata berupa ornamen Art
-> Nouveau bergaris hitam tebal atau klipart datar; keduanya bertabrakan
-> dengan nuansa emas-krem undangan ini. Menggambar sendiri juga membuat
-> warnanya bisa persis mengikuti palet, tetap tajam di layar mana pun, dan
-> ukurannya hanya beberapa kilobita.
+| Bagian | Asal |
+|---|---|
+| Kuntum mawar putih (`public/hias-*.png`) | potongan dari plat botani domain publik |
+| Tangkai dan dedaunan | vektor SVG di dalam `index.html` (`#ranting`, `#daun`) |
 
-Mengubahnya: `.portrait__bunga` untuk posisi dan ukuran, atau bentuk dasar
-di bagian definisi SVG untuk rupa dan warnanya.
+Alasannya: plat botani berisi spesimen tegak berduri yang tidak bisa disusun
+menjadi ornamen, sedangkan vektor sulit menandingi keindahan kuntum aslinya.
+Jadi masing-masing dipakai untuk bagian yang paling cocok.
+
+**Sumber kuntum.** *Rosa alba — Rosier blanc*, dilukis P. Bessa, diukir
+Gabriel; pindaian koleksi The New York Public Library lewat Wikimedia
+Commons. **Domain publik**, bebas dipakai termasuk untuk keperluan komersial.
+Berkas sumbernya tidak ikut disimpan di repo; unduh ulang bila perlu:
+
+```bash
+mkdir -p assets-src/unduh
+curl -L -o assets-src/unduh/rosa-alba.jpg \
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/Fig._1._Rosa_alba_-_Rosier_blanc._Fig._Rosa_Pimpinellifolia_-_rosier_%C3%A0_feuilles_de_Pimprenelle._%28Alba_Semi-Plena%3B_White_Rose_of_York_-_Scotch_Rose%2C_Burnet_rose%29_%28NYPL_b14485031-1110812%29.tiff/lossy-page1-960px-thumbnail.tiff.jpg"
+
+cd assets-src && npm i jpeg-js && node botani.mjs
+```
+
+`botani.mjs` memisahkan gambar dari kertas (kertasnya terang dan nyaris tanpa
+warna, terang ~239 dan saturasi < 0,05), membuang bercak usia, menyelaraskan
+warnanya ke palet undangan (`TURUN_SATURASI`, `TARIK_KE_KREM`), lalu menulis
+PNG bertransparansi. Bagian mana yang dipotong diatur lewat `POTONGAN`.
+
+Mengubah tata letaknya: `.bunga--bawah` / `.bunga--kiri` / `.bunga--kanan`
+untuk posisi dan ukuran, atau `<image>` dan `<use>` di dalam tiap rangkaian
+untuk susunannya.
+
+> Aset bunga siap pakai juga sempat dicoba dari FreeSVG dan koleksi ornamen
+> Wikimedia. Yang berlisensi bebas ternyata berupa ornamen Art Nouveau
+> bergaris hitam tebal atau klipart datar, keduanya bertabrakan dengan nuansa
+> emas-krem undangan ini. Plat botani di atas jauh lebih cocok.
 
 Tidak ada `npm install`, tidak ada framework, tidak ada backend terpisah.
 `api/doa.js` memanggil Upstash lewat REST API biasa, jadi Vercel bisa langsung

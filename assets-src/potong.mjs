@@ -128,6 +128,22 @@ const latar = new Uint8Array(N);
   }
 }
 
+function lembutkanF(src, radius) {
+  const tmp = new Float32Array(N), out = new Float32Array(N);
+  const n = radius * 2 + 1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    let s = 0;
+    for (let k = -radius; k <= radius; k++) s += src[y * W + Math.min(W - 1, Math.max(0, x + k))];
+    tmp[y * W + x] = s / n;
+  }
+  for (let x = 0; x < W; x++) for (let y = 0; y < H; y++) {
+    let s = 0;
+    for (let k = -radius; k <= radius; k++) s += tmp[Math.min(H - 1, Math.max(0, y + k)) * W + x];
+    out[y * W + x] = s / n;
+  }
+  return out;
+}
+
 /* ---------- 3. susun alpha akhir ---------- */
 // Pita ketidakpastian: hanya di sekitar latar alpha lembut dipakai.
 // Di luar itu subjek dianggap penuh, supaya wajah dan kacamata tidak
@@ -137,7 +153,7 @@ const dekatLatar = morph(latar, JENDELA + 3, 'dilate');
 const alpha = new Float32Array(N);
 for (let p = 0; p < N; p++) {
   if (latar[p]) alpha[p] = 0;
-  else if (dekatLatar[p]) alpha[p] = mulus(alphaMentah[p], 0.30, 0.80);
+  else if (dekatLatar[p]) alpha[p] = mulus(alphaMentah[p], 0.26, 0.86);
   else alpha[p] = 1;
 }
 
@@ -171,6 +187,15 @@ for (let p = 0; p < N; p++) {
   for (let p = 0; p < N; p++) inti[p] = (padat[p] && label[p] === terbaik) ? 1 : 0;
   const dekatBadan = morph(inti, 14, 'dilate');
   for (let p = 0; p < N; p++) if (!dekatBadan[p]) alpha[p] = 0;
+}
+
+// Lembutkan tepi supaya menyatu dengan krem halaman. Kain putihnya hanya
+// belasan tingkat lebih gelap daripada latar, jadi peralihan satu piksel
+// pun sudah terbaca sebagai garis. Bagian dalam bernilai satu rata sehingga
+// tidak terpengaruh; yang berubah hanya pita tepinya.
+{
+  const halus = lembutkanF(alpha, 3);
+  for (let p = 0; p < N; p++) alpha[p] = halus[p];
 }
 
 let luas = 0, atas = H, bawah = -1, kiri = W, kanan = -1;
