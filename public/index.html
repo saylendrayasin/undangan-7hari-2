@@ -271,114 +271,151 @@
         </div>
 
         <!-- Hiasan bunga di sekeliling lengkungan. Murni dekoratif, karena itu
-             aria-hidden dan tidak menerima klik. -->
+             aria-hidden dan tidak menerima klik.
+
+             Digambar tangan sebagai SVG, bukan gambar unduhan: hanya dengan
+             begitu warnanya bisa persis mengikuti palet emas undangan, dan
+             hasilnya tetap tajam di layar mana pun dengan ukuran beberapa
+             kilobita saja. Bentuk dasarnya didefinisikan sekali lalu dipakai ulang
+             pada ketiga rangkaian. -->
         <div class="portrait__bunga" aria-hidden="true">
-          <svg class="bunga--bawah" viewBox="0 0 340 132" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true">
             <defs>
-              <g id="kelopak">
-                <g fill="#faf0dd" stroke="#c9a24c" stroke-opacity=".5" stroke-width="1">
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(45)" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(90)" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(135)" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(180)" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(225)" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(270)" />
-                  <ellipse cx="0" cy="-11" rx="6.5" ry="11.5" transform="rotate(315)" />
+              <!-- bentuk dasar kelopak: pangkal di titik asal, ujung ke atas -->
+              <path id="kBesar" d="M0 0C-9-6-12-18 0-24 12-18 9-6 0 0Z" />
+              <path id="kBulat" d="M0 0C-11-8-13-20 0-26 13-20 11-8 0 0Z" />
+              <path id="kKecil" d="M0 0C-7-4-9-13 0-16 9-13 7-4 0 0Z" />
+
+              <!-- mawar: tiga lapis kelopak, makin ke dalam makin hangat -->
+              <g id="mawar">
+                <g fill="#fdf5e8" stroke="#d3b276" stroke-width="1.05" stroke-linejoin="round">
+                  <use href="#kBesar" /><use href="#kBesar" transform="rotate(60)" />
+                  <use href="#kBesar" transform="rotate(120)" /><use href="#kBesar" transform="rotate(180)" />
+                  <use href="#kBesar" transform="rotate(240)" /><use href="#kBesar" transform="rotate(300)" />
                 </g>
-                <circle r="6.2" fill="#f1dfbe" stroke="#a9822f" stroke-opacity=".45" stroke-width="1" />
-                <path d="M-3.4 1.2a3.4 3.4 0 1 1 6.8 0" stroke="#a9822f" stroke-opacity=".7" stroke-width="1" stroke-linecap="round" />
+                <g fill="#f9ecd6" stroke="#cba85f" stroke-width="1.3" stroke-linejoin="round" transform="scale(.7)">
+                  <use href="#kBesar" transform="rotate(36)" /><use href="#kBesar" transform="rotate(108)" />
+                  <use href="#kBesar" transform="rotate(180)" /><use href="#kBesar" transform="rotate(252)" />
+                  <use href="#kBesar" transform="rotate(324)" />
+                </g>
+                <g fill="#f3e0bd" stroke="#c09a4f" stroke-width="1.9" stroke-linejoin="round" transform="scale(.42)">
+                  <use href="#kBesar" transform="rotate(18)" /><use href="#kBesar" transform="rotate(108)" />
+                  <use href="#kBesar" transform="rotate(198)" /><use href="#kBesar" transform="rotate(288)" />
+                </g>
+                <path d="M0 3a4.5 4.5 0 1 1 4.5-4.5 7 7 0 1 1-9 0" fill="none"
+                      stroke="#a9822f" stroke-width="1.15" stroke-linecap="round" opacity=".8" />
               </g>
-              <g id="daun">
-                <path d="M0 0C6.4-7.6 6.4-20 0-28.5-6.4-20-6.4-7.6 0 0Z" fill="#c3cdb6" stroke="#93a086" stroke-opacity=".75" stroke-width=".9" />
-                <path d="M0-3v-22" stroke="#93a086" stroke-opacity=".65" stroke-width=".8" stroke-linecap="round" />
+
+              <!-- peoni: kelopak lebih bulat dan lebih rapat -->
+              <g id="peoni">
+                <g fill="#fdf3e4" stroke="#d3b276" stroke-width="1.05" stroke-linejoin="round">
+                  <use href="#kBulat" /><use href="#kBulat" transform="rotate(51)" />
+                  <use href="#kBulat" transform="rotate(102)" /><use href="#kBulat" transform="rotate(153)" />
+                  <use href="#kBulat" transform="rotate(204)" /><use href="#kBulat" transform="rotate(255)" />
+                  <use href="#kBulat" transform="rotate(306)" />
+                </g>
+                <g fill="#f8e9cf" stroke="#cba85f" stroke-width="1.5" stroke-linejoin="round" transform="scale(.62)">
+                  <use href="#kBulat" transform="rotate(25)" /><use href="#kBulat" transform="rotate(97)" />
+                  <use href="#kBulat" transform="rotate(169)" /><use href="#kBulat" transform="rotate(241)" />
+                  <use href="#kBulat" transform="rotate(313)" />
+                </g>
+                <circle r="5.5" fill="#eed8ab" stroke="#a9822f" stroke-opacity=".5" stroke-width="1" />
               </g>
+
+              <!-- bunga kecil terbuka, dengan benang sari -->
+              <g id="bungaKecil">
+                <g fill="#fdf6ea" stroke="#d3b276" stroke-width="1" stroke-linejoin="round">
+                  <use href="#kKecil" /><use href="#kKecil" transform="rotate(72)" />
+                  <use href="#kKecil" transform="rotate(144)" /><use href="#kKecil" transform="rotate(216)" />
+                  <use href="#kKecil" transform="rotate(288)" />
+                </g>
+                <g stroke="#b8912f" stroke-width=".9" stroke-linecap="round" opacity=".85">
+                  <path d="M0 0-3-5" /><path d="M0 0 3-5" /><path d="M0 0 0-6" />
+                </g>
+                <circle r="2.2" fill="#d9b767" />
+              </g>
+
+              <!-- kuncup -->
               <g id="kuncup">
-                <path d="M0 0c4.6-4.4 4.6-12 0-16.5-4.6 4.5-4.6 12.1 0 16.5Z" fill="#f6e8d2" stroke="#c9a24c" stroke-opacity=".55" stroke-width=".9" />
+                <path d="M0 0c5-5 5-13 0-18-5 5-5 13 0 18Z" fill="#f8ecd8" stroke="#cba85f" stroke-width="1" stroke-linejoin="round" />
+                <path d="M0-2v-13" stroke="#c09a4f" stroke-width=".8" opacity=".6" />
+              </g>
+
+              <!-- ranting daun bulat, gaya eukaliptus -->
+              <g id="ranting">
+                <path d="M0 0C9-13 13-30 11-50" fill="none" stroke="#9aa88c" stroke-width="1.2" stroke-linecap="round" />
+                <g fill="#c6d0b8" stroke="#93a086" stroke-width=".9">
+                  <ellipse cx="-6" cy="-9" rx="6.5" ry="8.5" transform="rotate(-28 -6 -9)" />
+                  <ellipse cx="10" cy="-15" rx="6" ry="8" transform="rotate(24 10 -15)" />
+                  <ellipse cx="-1" cy="-25" rx="6" ry="8" transform="rotate(-16 -1 -25)" />
+                  <ellipse cx="14" cy="-33" rx="5.5" ry="7.5" transform="rotate(30 14 -33)" />
+                  <ellipse cx="5" cy="-43" rx="5" ry="7" transform="rotate(6 5 -43)" />
+                  <ellipse cx="13" cy="-52" rx="4.5" ry="6" transform="rotate(20 13 -52)" />
+                </g>
+              </g>
+
+              <!-- daun lancip tunggal -->
+              <g id="daun">
+                <path d="M0 0C7-8 7-21 0-30-7-21-7-8 0 0Z" fill="#bcc8ad" stroke="#8f9d82" stroke-width=".9" stroke-linejoin="round" />
+                <path d="M0-3v-23" stroke="#8f9d82" stroke-width=".8" opacity=".65" stroke-linecap="round" />
               </g>
             </defs>
-
-            <!-- tangkai -->
-            <g stroke="#a8b39b" stroke-opacity=".75" stroke-width="1.1" stroke-linecap="round">
-              <path d="M170 104C140 100 108 96 74 86" />
-              <path d="M170 104c30-4 62-8 96-18" />
-              <path d="M170 104c-14-10-26-22-34-36" />
-              <path d="M170 104c14-10 26-22 34-36" />
-            </g>
-
-            <!-- dedaunan -->
-            <g>
-              <use href="#daun" transform="translate(60 92) rotate(-64) scale(.92)" />
-              <use href="#daun" transform="translate(84 100) rotate(-38) scale(.8)" />
-              <use href="#daun" transform="translate(112 106) rotate(-16) scale(.7)" />
-              <use href="#daun" transform="translate(280 92) rotate(64) scale(.92)" />
-              <use href="#daun" transform="translate(256 100) rotate(38) scale(.8)" />
-              <use href="#daun" transform="translate(228 106) rotate(16) scale(.7)" />
-              <use href="#daun" transform="translate(146 74) rotate(-24) scale(.62)" />
-              <use href="#daun" transform="translate(194 74) rotate(24) scale(.62)" />
-              <use href="#daun" transform="translate(170 62) scale(.55)" />
-            </g>
-
-            <!-- kuncup kecil -->
-            <g>
-              <use href="#kuncup" transform="translate(48 84) rotate(-52)" />
-              <use href="#kuncup" transform="translate(292 84) rotate(52)" />
-              <use href="#kuncup" transform="translate(133 62) rotate(-18) scale(.85)" />
-              <use href="#kuncup" transform="translate(207 62) rotate(18) scale(.85)" />
-            </g>
-
-            <!-- bunga: satu besar di tengah, mengecil ke samping -->
-            <use href="#kelopak" transform="translate(170 92) scale(1.22)" />
-            <use href="#kelopak" transform="translate(116 100) scale(.86)" />
-            <use href="#kelopak" transform="translate(224 100) scale(.86)" />
-            <use href="#kelopak" transform="translate(84 108) scale(.6)" />
-            <use href="#kelopak" transform="translate(256 108) scale(.6)" />
-            <use href="#kelopak" transform="translate(148 116) scale(.5)" />
-            <use href="#kelopak" transform="translate(192 116) scale(.5)" />
           </svg>
 
-          <svg class="bunga--kiri" viewBox="0 0 170 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g stroke="#a8b39b" stroke-opacity=".75" stroke-width="1.1" stroke-linecap="round">
-              <path d="M62 62c14 18 26 40 34 66" />
-              <path d="M62 62c-10 10-18 24-22 40" />
-              <path d="M62 62c16-6 32-8 48-6" />
+          <!-- rangkaian besar di tengah bawah -->
+          <svg class="bunga--bawah" viewBox="0 0 360 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity=".95">
+              <use href="#ranting" transform="translate(96 122) rotate(-118) scale(1.05)" />
+              <use href="#ranting" transform="translate(264 122) rotate(118) scale(1.05)" />
+              <use href="#ranting" transform="translate(132 132) rotate(-152) scale(.8)" />
+              <use href="#ranting" transform="translate(228 132) rotate(152) scale(.8)" />
+              <use href="#daun" transform="translate(180 84) rotate(-8) scale(.85)" />
+              <use href="#daun" transform="translate(150 96) rotate(-40) scale(.7)" />
+              <use href="#daun" transform="translate(210 96) rotate(40) scale(.7)" />
+              <use href="#kuncup" transform="translate(120 104) rotate(-44)" />
+              <use href="#kuncup" transform="translate(240 104) rotate(44)" />
+              <use href="#kuncup" transform="translate(168 82) rotate(-14) scale(.9)" />
+              <use href="#kuncup" transform="translate(192 82) rotate(14) scale(.9)" />
             </g>
-            <g>
-              <use href="#daun" transform="translate(40 118) rotate(196) scale(.8)" />
-              <use href="#daun" transform="translate(88 122) rotate(158) scale(.72)" />
-              <use href="#daun" transform="translate(104 66) rotate(78) scale(.68)" />
-              <use href="#daun" transform="translate(46 46) rotate(-28) scale(.72)" />
-              <use href="#daun" transform="translate(76 40) rotate(18) scale(.6)" />
-            </g>
-            <g>
-              <use href="#kuncup" transform="translate(112 74) rotate(104) scale(.9)" />
-              <use href="#kuncup" transform="translate(30 92) rotate(-146) scale(.8)" />
-            </g>
-            <use href="#kelopak" transform="translate(62 62) scale(1)" />
-            <use href="#kelopak" transform="translate(98 40) scale(.62)" />
-            <use href="#kelopak" transform="translate(70 100) scale(.52)" />
+            <use href="#peoni" transform="translate(139 116) rotate(-14) scale(.82)" />
+            <use href="#peoni" transform="translate(221 116) rotate(16) scale(.8)" />
+            <use href="#mawar" transform="translate(180 110) scale(1.05)" />
+            <use href="#bungaKecil" transform="translate(107 122) rotate(-22) scale(.95)" />
+            <use href="#bungaKecil" transform="translate(253 122) rotate(22) scale(.95)" />
+            <use href="#bungaKecil" transform="translate(159 136) rotate(8) scale(.72)" />
+            <use href="#bungaKecil" transform="translate(201 136) rotate(-8) scale(.72)" />
           </svg>
 
-          <svg class="bunga--kanan" viewBox="0 0 170 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g stroke="#a8b39b" stroke-opacity=".75" stroke-width="1.1" stroke-linecap="round">
-              <path d="M62 62c14 18 26 40 34 66" />
-              <path d="M62 62c-10 10-18 24-22 40" />
-              <path d="M62 62c16-6 32-8 48-6" />
+          <!-- rangkaian kecil di kiri atas -->
+          <svg class="bunga--kiri" viewBox="0 0 170 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity=".95">
+              <use href="#ranting" transform="translate(78 78) rotate(150) scale(.95)" />
+              <use href="#ranting" transform="translate(66 66) rotate(-42) scale(.8)" />
+              <use href="#daun" transform="translate(104 92) rotate(120) scale(.75)" />
+              <use href="#daun" transform="translate(44 52) rotate(-36) scale(.7)" />
+              <use href="#kuncup" transform="translate(102 58) rotate(58)" />
+              <use href="#kuncup" transform="translate(52 108) rotate(196) scale(.85)" />
             </g>
-            <g>
-              <use href="#daun" transform="translate(40 118) rotate(196) scale(.8)" />
-              <use href="#daun" transform="translate(88 122) rotate(158) scale(.72)" />
-              <use href="#daun" transform="translate(104 66) rotate(78) scale(.68)" />
-              <use href="#daun" transform="translate(46 46) rotate(-28) scale(.72)" />
-              <use href="#daun" transform="translate(76 40) rotate(18) scale(.6)" />
+            <use href="#mawar" transform="translate(70 72) rotate(-10) scale(.86)" />
+            <use href="#peoni" transform="translate(104 46) rotate(14) scale(.56)" />
+            <use href="#bungaKecil" transform="translate(46 104) rotate(-18) scale(.8)" />
+            <use href="#bungaKecil" transform="translate(96 96) rotate(24) scale(.6)" />
+          </svg>
+
+          <!-- kanan atas: cerminan yang kiri, supaya seimbang -->
+          <svg class="bunga--kanan" viewBox="0 0 170 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g opacity=".95">
+              <use href="#ranting" transform="translate(78 78) rotate(150) scale(.95)" />
+              <use href="#ranting" transform="translate(66 66) rotate(-42) scale(.8)" />
+              <use href="#daun" transform="translate(104 92) rotate(120) scale(.75)" />
+              <use href="#daun" transform="translate(44 52) rotate(-36) scale(.7)" />
+              <use href="#kuncup" transform="translate(102 58) rotate(58)" />
+              <use href="#kuncup" transform="translate(52 108) rotate(196) scale(.85)" />
             </g>
-            <g>
-              <use href="#kuncup" transform="translate(112 74) rotate(104) scale(.9)" />
-              <use href="#kuncup" transform="translate(30 92) rotate(-146) scale(.8)" />
-            </g>
-            <use href="#kelopak" transform="translate(62 62) scale(1)" />
-            <use href="#kelopak" transform="translate(98 40) scale(.62)" />
-            <use href="#kelopak" transform="translate(70 100) scale(.52)" />
+            <use href="#mawar" transform="translate(70 72) rotate(-10) scale(.86)" />
+            <use href="#peoni" transform="translate(104 46) rotate(14) scale(.56)" />
+            <use href="#bungaKecil" transform="translate(46 104) rotate(-18) scale(.8)" />
+            <use href="#bungaKecil" transform="translate(96 96) rotate(24) scale(.6)" />
           </svg>
         </div>
       </div>

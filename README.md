@@ -22,44 +22,57 @@ Isi `assets-src/`:
 
 | File | Keterangan |
 |---|---|
-| `foto-studio-asli.jpeg` | **foto yang dipakai sekarang** — hasil studio, latar abu polos |
-| `studio.mjs` | membuang latar studio dan menyusunnya ke bingkai 4:5 |
+| `foto-potong-asli.jpeg` | **foto yang dipakai sekarang** — sudah dipotong alat penghapus latar |
+| `potong.mjs` | menghapus pola kotak transparansi dan menyusun ke bingkai 4:5 |
 | `undangan-cetak.jpeg` | scan undangan cetak, acuan warna |
-| `foto-almarhumah-asli.jpeg` | foto lama (baju merah, latar acara) — arsip |
-| `foto-almarhumah-putih.jpg` | foto lama setelah baju diputihkan — arsip |
-| `whiten.mjs` | skrip lama: baju & hijab merah jadi putih — arsip |
-| `cutout.mjs` | skrip lama: buang latar acara — arsip |
+| `foto-studio-asli.jpeg`, `studio.mjs` | percobaan sebelumnya (latar studio abu) — arsip |
+| `foto-almarhumah-asli.jpeg`, `foto-almarhumah-putih.jpg` | foto lama berbaju merah — arsip |
+| `whiten.mjs`, `cutout.mjs` | skrip lama untuk foto merah — arsip |
 
 Foto yang terpasang dibuat dengan:
 
 ```bash
 npm i jpeg-js
-node assets-src/studio.mjs        # -> studio-hasil.jpg
-cp studio-hasil.jpg public/foto-almarhumah.jpg
+node assets-src/potong.mjs        # -> potong-hasil.jpg
+cp potong-hasil.jpg public/foto-almarhumah.jpg
 ```
 
-Cara kerjanya: latar studio dimodelkan sebagai permukaan kuadratik (vignet
-dua dimensi), lalu piksel yang menyimpang dari model dianggap subjek.
+**Cara kerjanya.** Foto sumber sudah bebas latar, tetapi pola kotak-kotak
+penanda transparansi ikut tercetak menjadi piksel JPEG. Pola itu tidak bisa
+dihapus lewat warna saja: kotak terangnya bernilai 255, sama persis dengan
+baju putihnya.
 
-> **Batasnya:** di rok bagian bawah, beda terang antara kain dan latar hanya
-> 4-5 tingkat — tidak ada cara otomatis yang bisa memisahkannya. Karena itu
-> subjek hanya dipotong sampai sekitar pinggul, lalu bawahnya dilarutkan ke
-> krem (`LARUT_MULAI`). Rangkaian bunga di halaman duduk tepat di area larut
-> itu, jadi peralihannya terbaca sebagai komposisi.
+Yang dipakai adalah **amplitudo polanya**. Di mana subjek menutupi, pola
+meredup lalu hilang — jadi simpangan baku lokal berbanding lurus dengan
+`1 - alpha`. Ini sekaligus menghasilkan tepi yang halus di rambut dan kain,
+tanpa perlu menebak letak grid (yang memang tidak konsisten karena gambarnya
+pernah diubah ukuran: periodenya 15,2 mendatar dan 15,9 tegak).
 
-Setelan yang sering perlu diubah, semuanya di bagian atas `studio.mjs`:
-`AMBANG` (kepekaan pemisahan), `LARUT_MULAI` (tinggi mulai larut),
-`POTONG` (bingkai akhir), dan `LAJUR_KIRI`/`kananLajur` (batas kiri-kanan).
+Warna tepi yang masih tercampur warna kotak dibatalkan dengan
+`S = (I - (1-a)*C) / a`. Tanpa langkah itu tersisa garis abu tipis di siluet.
+
+Setelan di bagian atas `potong.mjs`: `JENDELA` (ukuran jendela ukur),
+`LARUT_MULAI` (tinggi mulai dilarutkan ke krem), dan `POTONG` (bingkai akhir).
 
 ### Hiasan bunga
 
-Bunga di sekeliling bingkai lengkung adalah **SVG di dalam `index.html`**,
-bukan gambar — tetap tajam di layar mana pun dan ukurannya hanya beberapa
-kilobita. Ada tiga: satu besar di tengah bawah, satu di kiri atas, satu di
-kanan atas (yang kanan adalah cerminan yang kiri lewat `scaleX(-1)`).
+Bunga di sekeliling bingkai lengkung adalah **SVG yang digambar tangan di
+dalam `index.html`**, bukan gambar unduhan. Ada tiga rangkaian: besar di
+tengah bawah, kecil di kiri atas, dan cerminannya di kanan atas.
 
-Mengubahnya: cari `.portrait__bunga` untuk posisi dan ukuran, atau `#kelopak`
-/ `#daun` / `#kuncup` di dalam `<defs>` untuk bentuk dan warnanya.
+Bentuk dasarnya didefinisikan sekali lalu dipakai ulang: `#mawar` (tiga lapis
+kelopak), `#peoni`, `#bungaKecil` (berbenang sari), `#kuncup`, `#ranting`
+(daun bulat gaya eukaliptus), dan `#daun`.
+
+> Aset bunga siap pakai dari luar sempat dicoba — FreeSVG dan Wikimedia
+> Commons. Yang berlisensi bebas dan bisa diunduh ternyata berupa ornamen Art
+> Nouveau bergaris hitam tebal atau klipart datar; keduanya bertabrakan
+> dengan nuansa emas-krem undangan ini. Menggambar sendiri juga membuat
+> warnanya bisa persis mengikuti palet, tetap tajam di layar mana pun, dan
+> ukurannya hanya beberapa kilobita.
+
+Mengubahnya: `.portrait__bunga` untuk posisi dan ukuran, atau bentuk dasar
+di bagian definisi SVG untuk rupa dan warnanya.
 
 Tidak ada `npm install`, tidak ada framework, tidak ada backend terpisah.
 `api/doa.js` memanggil Upstash lewat REST API biasa, jadi Vercel bisa langsung
